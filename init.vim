@@ -1,17 +1,11 @@
-" Tabs and Indentation
-" set tabstop=2
-" set shiftwidth=2
-" set expandtab
-" set softtabstop=2
-
 " Line Numbers
 set number
 set relativenumber
 
 " Indentation and Wrapping
 set autoindent
-" set smarttab
-" set cindent
+set smarttab
+set cindent
 set textwidth=80
 
 " Display
@@ -35,13 +29,18 @@ set hlsearch
 syntax on
 
 " Color Scheme
-colorscheme habamax
+" colorscheme habamax
 
-" Filetype Specific Settings (Example for Python)
-autocmd FileType python setlocal tabstop=4 shiftwidth=4 expandtab
 
-" Every new tab to start with a vertical split
-" autocmd TabNewEntered * vsplit
+" Filetype Specific Settings 
+autocmd FileType python setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
+
+autocmd FileType html setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+
+autocmd FileType css setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+
+autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+
 
 " Use Ctrl + Tab / Ctrl + Shift + Tab to switch tabs
 nnoremap <C-t>   :tabnext<CR>
@@ -72,8 +71,6 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 Plug 'scrooloose/nerdtree'
 
-" Plug 'tsony-tsonev/nerdtree-git-plugin'
-
 Plug 'Xuyuanp/nerdtree-git-plugin'
 
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
@@ -94,11 +91,17 @@ Plug 'nvim-lua/popup.nvim'
 
 Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
 
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-
 Plug 'vim-airline/vim-airline'
 
 Plug 'vim-airline/vim-airline-themes'
+
+Plug 'dense-analysis/ale'
+
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+
+Plug 'folke/tokyonight.nvim'
+
+Plug 'tpope/vim-fugitive'
 
 call plug#end()
 
@@ -188,6 +191,7 @@ autocmd CursorHold * silent call CocActionAsync('highlight')
 nmap <F2> <Plug>(coc-rename)
 
 
+" TELESCOPE
 " Find files using Telescope command-line sugar.
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
@@ -200,6 +204,52 @@ nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
 
+
 " VIM-AIRLINE
 " let g:airline_theme='jellybeans'
 let g:airline_theme='luna'
+let g:airline#extensions#branch#enabled = 1
+
+
+" ALE (Asynchronous Lint Engine)
+let g:ale_linters = {
+\   'python': ['flake8', 'pylint', 'mypy'],
+\   'css': ['stylelint'],
+\   'scss': ['stylelint'],
+\   'html': ['htmlhint']
+\}
+
+let g:ale_fixers = {
+\   'python': ['black', 'autopep8'],
+\}
+
+" Enable fixing on save
+" let g:ale_fix_on_save = 1
+
+" Set Python linters
+let g:ale_python_flake8_options = '--max-line-length=88'
+let g:ale_python_pylint_options = '--disable=C0114,C0115,C0116'
+
+
+" TREESITTER
+lua << EOF
+require('nvim-treesitter.configs').setup({
+    ensure_installed = { "python", "javascript", "typescript", "lua", "bash", "json", "html", "css" }, -- Add your languages here
+    highlight = {
+        enable = true, -- Enable syntax highlighting
+    },
+    indent = {
+        enable = true, -- Enable indentation
+    },
+})
+EOF
+
+
+" TOKYONIGHT COLORSHCEME
+lua << EOF
+require("tokyonight").setup({
+    style = "night",  -- Options: "night", "storm", "day", "moon"
+})
+EOF
+
+colorscheme tokyonight
