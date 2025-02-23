@@ -41,6 +41,7 @@ autocmd FileType css setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
 autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
+autocmd FileType typescript setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
 " Use Ctrl + Tab / Ctrl + Shift + Tab to switch tabs
 nnoremap <C-t>   :tabnext<CR>
@@ -57,6 +58,12 @@ nnoremap <A-Left>  :leftabove vsplit<CR>
 nnoremap <A-Down>  :split<CR>
 nnoremap <A-Up>    :aboveleft split<CR>
 nnoremap <A-Right> :vsplit<CR>
+
+" Use Ctrl+` to open terminal
+nnoremap <S-n> :belowright split<CR>:terminal<CR>
+
+" Remap terminal exit shortcut
+tnoremap <Esc> <C-\><C-n>
 
 " Resize splits using Shift + Arrow keys
 nnoremap <S-Left>  :vertical resize -5<CR>
@@ -102,6 +109,27 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'folke/tokyonight.nvim'
 
 Plug 'tpope/vim-fugitive'
+
+Plug 'airblade/vim-gitgutter'
+
+" LSP and autocompletion
+Plug 'neovim/nvim-lspconfig'          " Core LSP support
+
+Plug 'williamboman/mason.nvim'        " Easy LSP installation
+
+Plug 'williamboman/mason-lspconfig.nvim' " Bridge between Mason and lspconfig
+
+Plug 'hrsh7th/nvim-cmp'               " Autocompletion engine
+
+Plug 'hrsh7th/cmp-nvim-lsp'           " LSP completion source
+
+Plug 'hrsh7th/cmp-buffer'             " Buffer completion
+
+Plug 'hrsh7th/cmp-path'               " Path completion
+
+Plug 'saadparwaiz1/cmp_luasnip'       " Snippet completion
+
+Plug 'L3MON4D3/LuaSnip'               " Snippet engine
 
 call plug#end()
 
@@ -160,6 +188,43 @@ endfunction
 autocmd BufEnter * call SyncTree()
 
 
+" DEVICONS
+let g:webdevicons_enable = 1
+let g:webdevicons_enable_nerdtree = 1
+
+" Customize icons for specific file types
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {}
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['js'] = ''  " JavaScript
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['ts'] = ''  " TypeScript
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['py'] = ''  " Python
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['java'] = ''  " Java
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['html'] = ''  " HTML
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['css'] = ''  " CSS
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['json'] = ''  " JSON
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['lock'] = '󰌾'  " LOCK
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['yml'] = 'פּ'  " YAML
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['yaml'] = 'פּ'  " YAML
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['txt'] = ''  " Text file
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['sh'] = ''  " Shell script
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['sql'] = ''  " SQL file
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['db'] = ''  " Database file
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['sqlite'] = ''  " SQLite file
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['sqlite3'] = ''  " SQLite3 file
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['postgresql'] = ''  " PostgreSQL
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['mysql'] = ''  " MySQL
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['mongodb'] = ''  " MongoDB
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['map'] = '󰆑'  " .js.map file
+" let g:WebDevIconsUnicodeDecorateFileNodesExactSymbols['README.md'] = '󰋼'  " README file
+" let g:WebDevIconsUnicodeDecorateFileNodesExactSymbols['LICENSE'] = '󰿃'  " LICENSE file
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['md'] = '󰽛'  " Markdown
+
+
+" Customize folder icons
+let g:WebDevIconsUnicodeDecorateFolderNodes = 1
+let g:DevIconsDefaultFolderOpenSymbol = ''  " Open folder
+let g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = ''  " Closed folder
+
+
 " VIM-PRETTIER
 "let g:prettier#quickfix_enabled = 0
 "let g:prettier#quickfix_auto_focus = 0
@@ -209,26 +274,38 @@ nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
 " let g:airline_theme='jellybeans'
 let g:airline_theme='luna'
 let g:airline#extensions#branch#enabled = 1
+let g:airline#extensions#hunks#enabled = 1
 
 
 " ALE (Asynchronous Lint Engine)
+let g:ale_enabled = 1
+
 let g:ale_linters = {
 \   'python': ['flake8', 'pylint', 'mypy'],
 \   'css': ['stylelint'],
 \   'scss': ['stylelint'],
-\   'html': ['htmlhint']
+\   'html': ['htmlhint'],
+\   'javascript': ['eslint'],
+\   'typescript': ['eslint', 'tsserver'],
 \}
 
 let g:ale_fixers = {
 \   'python': ['black', 'autopep8'],
+\   'javascript': ['eslint', 'prettier'],
+\   'typescript': ['eslint', 'prettier'],
 \}
 
 " Enable fixing on save
-" let g:ale_fix_on_save = 1
+let g:ale_fix_on_save = 1
 
 " Set Python linters
 let g:ale_python_flake8_options = '--max-line-length=88'
 let g:ale_python_pylint_options = '--disable=C0114,C0115,C0116'
+
+" Use globally installed ESLint and Prettier
+let g:ale_javascript_eslint_use_global = 1
+let g:ale_javascript_prettier_use_global = 1
+let g:ale_javascript_eslint_options = '--config ~/.eslintrc.js'
 
 
 " TREESITTER
@@ -253,3 +330,46 @@ require("tokyonight").setup({
 EOF
 
 colorscheme tokyonight
+
+
+"  Configure LSP
+lua << EOF
+require("mason").setup()
+require("mason-lspconfig").setup({
+    ensure_installed = { "pyright", "ts_ls", "html", "cssls", "lua_ls" },
+    automatic_installation = true,
+})
+
+local lspconfig = require("lspconfig")
+local servers = { "pyright", "ts_ls", "html", "cssls", "lua_ls" }
+for _, server in ipairs(servers) do
+    lspconfig[server].setup({
+        -- You can disable or adjust diagnostics from LSP if ALE is handling linting
+        handlers = {
+            ["textDocument/publishDiagnostics"] = function() end
+        }
+    })
+end
+EOF
+
+
+" Configure Autocompletion
+lua << EOF
+local cmp = require("cmp")
+cmp.setup({
+    mapping = {
+        ["<C-Space>"] = cmp.mapping.complete(),
+        ["<CR>"] = cmp.mapping.confirm({ select = true }),
+    },
+    sources = {
+        { name = "nvim_lsp" },
+        { name = "luasnip" },
+    },
+    snippet = {
+        expand = function(args)
+            require("luasnip").lsp_expand(args.body)
+        end,
+    },
+})
+EOF
+
