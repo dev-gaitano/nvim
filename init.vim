@@ -43,6 +43,10 @@ autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2 expand
 
 autocmd FileType typescript setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
+autocmd FileType typescriptreact setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+
+autocmd FileType javascriptreact setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+
 
 " Exit insert mode with 'j+k'
 inoremap jk <ESC>
@@ -131,6 +135,8 @@ Plug 'saadparwaiz1/cmp_luasnip'       " Snippet completion
 
 Plug 'L3MON4D3/LuaSnip'               " Snippet engine
 
+Plug 'numToStr/Comment.nvim'          " Code Comments
+
 call plug#end()
 
 
@@ -152,13 +158,13 @@ vim.g.loaded_netrwPlugin = 1
 -- Setup nvim-web-devicons
 require("nvim-web-devicons").setup({
   override = {
-    js = { icon = "", color = "#cbcb41", name = "Js" },
+    js = { icon = "", color = "#cbcb41", name = "Js" },
     ts = { icon = "", color = "#519aba", name = "Ts" },
     py = { icon = "", color = "#3572A5", name = "Py" },
     java = { icon = "", color = "#cc3e44", name = "Java" },
     html = { icon = "", color = "#e34c26", name = "Html" },
     css = { icon = "", color = "#563d7c", name = "Css" },
-    json = { icon = "", color = "#cbcb41", name = "Json" },
+--    json = { icon = "", color = "#cbcb41", name = "Json" },
     lock = { icon = "󰌾", color = "#ff0000", name = "Lock" },
     yml = { icon = "פּ", color = "#6d8086", name = "Yml" },
     yaml = { icon = "פּ", color = "#6d8086", name = "Yaml" },
@@ -187,9 +193,9 @@ require("nvim-tree").setup({
     ignore = false,
     timeout = 500,
   },
-  filters = {
-    custom = { "^node_modules$" },
-  },
+--  filters = {
+--    custom = { "^node_modules$" },
+--  },
   update_focused_file = {
     enable = true,
     update_cwd = true,
@@ -285,14 +291,18 @@ let g:ale_linters = {
 \   'css': ['stylelint'],
 \   'scss': ['stylelint'],
 \   'html': ['htmlhint'],
-\   'javascript': ['eslint'],
+\   'javascript': ['eslint', 'tsserver'],
 \   'typescript': ['eslint', 'tsserver'],
+\   'typescriptreact': ['eslint', 'tsserver'],
+\   'javascriptreact': ['eslint', 'tsserver'],
 \}
 
 let g:ale_fixers = {
 \   'python': ['black', 'autopep8'],
 \   'javascript': ['eslint', 'prettier'],
 \   'typescript': ['eslint', 'prettier'],
+\   'typescriptreact': ['eslint', 'prettier'],
+\   'javascriptreact': ['eslint', 'prettier'],
 \}
 
 " Enable fixing on save
@@ -311,12 +321,9 @@ let g:ale_javascript_eslint_options = '--config ~/.eslintrc.js'
 " TREESITTER
 lua << EOF
 require('nvim-treesitter.configs').setup({
-    ensure_installed = { "python", "javascript", "typescript", "lua", "bash", "json", "html", "css" }, -- Add your languages here
+    ensure_installed = { "python", "javascript", "typescript", "tsx", "lua", "bash", "json", "html", "css" }, -- Add your languages here
     highlight = {
         enable = true, -- Enable syntax highlighting
-    },
-    indent = {
-        enable = true, -- Enable indentation
     },
 })
 EOF
@@ -332,7 +339,7 @@ EOF
 colorscheme tokyonight
 
 
-"  Configure LSP
+" LSP
 lua << EOF
 require("mason").setup()
 require("mason-lspconfig").setup({
@@ -373,3 +380,16 @@ cmp.setup({
 })
 EOF
 
+" COMMENTS NVIM
+lua << EOF
+require('Comment').setup()
+EOF
+
+" Map Ctrl + / to comment a line in Normal mode
+nnoremap <C-/> :lua require('Comment.api').toggle.linewise.current()<CR>
+
+" Map Ctrl + / to comment selected lines in Visual mode
+vnoremap <C-/> :lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>
+
+" Map Ctrl + / to comment the current line in Insert mode
+inoremap <C-/> <Esc>:lua require('Comment.api').toggle.linewise.current()<CR>gi
