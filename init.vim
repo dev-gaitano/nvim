@@ -43,6 +43,11 @@ autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2 expand
 
 autocmd FileType typescript setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
+
+" Exit insert mode with 'j+k'
+inoremap jk <ESC>
+
+
 " Use Ctrl + Tab / Ctrl + Shift + Tab to switch tabs
 nnoremap <C-t>   :tabnext<CR>
 nnoremap <C-A-t> :tabprevious<CR>
@@ -76,13 +81,9 @@ call plug#begin('~/.local/share/nvim/site/plugged')
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-Plug 'scrooloose/nerdtree'
+Plug 'nvim-tree/nvim-tree.lua'  	" File tree
 
-Plug 'Xuyuanp/nerdtree-git-plugin'
-
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
-
-Plug 'ryanoasis/vim-devicons'
+Plug 'nvim-tree/nvim-web-devicons'  	" File Icons
 
 Plug 'airblade/vim-gitgutter'
 
@@ -112,7 +113,6 @@ Plug 'tpope/vim-fugitive'
 
 Plug 'airblade/vim-gitgutter'
 
-" LSP and autocompletion
 Plug 'neovim/nvim-lspconfig'          " Core LSP support
 
 Plug 'williamboman/mason.nvim'        " Easy LSP installation
@@ -143,86 +143,86 @@ let g:coc_global_extensions = [
   \ ]
 
 
-" NERDTREE
-inoremap jk <ESC>
-nmap <C-b> :NERDTreeToggle<CR>
-vmap ++ <plug>NERDCommenterToggle
-nmap ++ <plug>NERDCommenterToggle
-" open NERDTree automatically
-"autocmd StdinReadPre * let s:std_in=1
-"autocmd VimEnter * NERDTree
+" NVIM TREE & NVIM WEB ICONS
+lua << EOF
+-- Disable netrw (recommended)
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 
-let g:NERDTreeGitStatusWithFlags = 1
-"let g:WebDevIconsUnicodeDecorateFolderNodes = 1
-"let g:NERDTreeGitStatusNodeColorization = 1
-"let g:NERDTreeColorMapCustom = {
-    "\ "Staged"    : "#0ee375",  
-    "\ "Modified"  : "#d9bf91",  
-    "\ "Renamed"   : "#51C9FC",  
-    "\ "Untracked" : "#FCE77C",  
-    "\ "Unmerged"  : "#FC51E6",  
-    "\ "Dirty"     : "#FFBD61",  
-    "\ "Clean"     : "#87939A",   
-    "\ "Ignored"   : "#808080"   
-    "\ }                         
+-- Setup nvim-web-devicons
+require("nvim-web-devicons").setup({
+  override = {
+    js = { icon = "", color = "#cbcb41", name = "Js" },
+    ts = { icon = "", color = "#519aba", name = "Ts" },
+    py = { icon = "", color = "#3572A5", name = "Py" },
+    java = { icon = "", color = "#cc3e44", name = "Java" },
+    html = { icon = "", color = "#e34c26", name = "Html" },
+    css = { icon = "", color = "#563d7c", name = "Css" },
+    json = { icon = "", color = "#cbcb41", name = "Json" },
+    lock = { icon = "󰌾", color = "#ff0000", name = "Lock" },
+    yml = { icon = "פּ", color = "#6d8086", name = "Yml" },
+    yaml = { icon = "פּ", color = "#6d8086", name = "Yaml" },
+    txt = { icon = "", color = "#6d8086", name = "Txt" },
+    sh = { icon = "", color = "#4d5a5e", name = "Sh" },
+    sql = { icon = "", color = "#ffd700", name = "Sql" },
+    db = { icon = "", color = "#ffd700", name = "Db" },
+    sqlite = { icon = "", color = "#ffd700", name = "Sqlite" },
+    sqlite3 = { icon = "", color = "#ffd700", name = "Sqlite3" },
+    postgresql = { icon = "", color = "#336791", name = "Postgresql" },
+    mysql = { icon = "", color = "#00758f", name = "Mysql" },
+    mongodb = { icon = "", color = "#589636", name = "Mongodb" },
+    map = { icon = "󰆑", color = "#cbcb41", name = "Map" },
+    md = { icon = "󰽛", color = "#519aba", name = "Md" },
+  },
+  default = true,
+})
 
+-- Setup nvim-tree
+require("nvim-tree").setup({
+  view = {
+    width = 30,
+  },
+  git = {
+    enable = true,
+    ignore = false,
+    timeout = 500,
+  },
+  filters = {
+    custom = { "^node_modules$" },
+  },
+  update_focused_file = {
+    enable = true,
+    update_cwd = true,
+  },
+  renderer = {
+    icons = {
+      glyphs = {
+        default = "",
+        symlink = "",
+        git = {
+          unstaged = "",
+          staged = "S",
+          unmerged = "",
+          renamed = "➜",
+          deleted = "",
+          untracked = "U",
+          ignored = "◌",
+        },
+        folder = {
+          default = "",
+          open = "",
+          empty = "",
+          empty_open = "",
+          symlink = "",
+        },
+      },
+    },
+  },
+})
+EOF
 
-let g:NERDTreeIgnore = ['^node_modules$']
-
-" sync open file with NERDTree
-" " Check if NERDTree is open or active
-function! IsNERDTreeOpen()        
-  return exists("t:NERDTreeBufName") && (bufwinnr(t:NERDTreeBufName) != -1)
-endfunction
-
-" Call NERDTreeFind iff NERDTree is active, current window contains a modifiable
-" file, and we're not in vimdiff
-function! SyncTree()
-  if &modifiable && IsNERDTreeOpen() && strlen(expand('%')) > 0 && !&diff
-    NERDTreeFind
-    wincmd p
-  endif
-endfunction
-
-" Highlight currently open buffer in NERDTree
-autocmd BufEnter * call SyncTree()
-
-
-" DEVICONS
-let g:webdevicons_enable = 1
-let g:webdevicons_enable_nerdtree = 1
-
-" Customize icons for specific file types
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {}
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['js'] = ''  " JavaScript
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['ts'] = ''  " TypeScript
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['py'] = ''  " Python
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['java'] = ''  " Java
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['html'] = ''  " HTML
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['css'] = ''  " CSS
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['json'] = ''  " JSON
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['lock'] = '󰌾'  " LOCK
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['yml'] = 'פּ'  " YAML
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['yaml'] = 'פּ'  " YAML
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['txt'] = ''  " Text file
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['sh'] = ''  " Shell script
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['sql'] = ''  " SQL file
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['db'] = ''  " Database file
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['sqlite'] = ''  " SQLite file
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['sqlite3'] = ''  " SQLite3 file
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['postgresql'] = ''  " PostgreSQL
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['mysql'] = ''  " MySQL
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['mongodb'] = ''  " MongoDB
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['map'] = '󰆑'  " .js.map file
-" let g:WebDevIconsUnicodeDecorateFileNodesExactSymbols['README.md'] = '󰋼'  " README file
-" let g:WebDevIconsUnicodeDecorateFileNodesExactSymbols['LICENSE'] = '󰿃'  " LICENSE file
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['md'] = '󰽛'  " Markdown
-
-
-" Customize folder icons
-let g:WebDevIconsUnicodeDecorateFolderNodes = 1
-let g:DevIconsDefaultFolderOpenSymbol = ''  " Open folder
-let g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = ''  " Closed folder
+" Keybinding to toggle the file tree
+nnoremap <C-b> :NvimTreeToggle<CR>
 
 
 " VIM-PRETTIER
