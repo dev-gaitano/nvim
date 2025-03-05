@@ -137,6 +137,10 @@ Plug 'L3MON4D3/LuaSnip'               " Snippet engine
 
 Plug 'numToStr/Comment.nvim'          " Code Comments
 
+Plug 'glepnir/lspsaga.nvim'           " UI Enhancements for LSP
+
+Plug 'lewis6991/hover.nvim'
+
 call plug#end()
 
 
@@ -349,14 +353,40 @@ require("mason-lspconfig").setup({
 
 local lspconfig = require("lspconfig")
 local servers = { "pyright", "ts_ls", "html", "cssls", "lua_ls" }
-for _, server in ipairs(servers) do
+
+for _, server in pairs(servers) do
     lspconfig[server].setup({
-        -- You can disable or adjust diagnostics from LSP if ALE is handling linting
         handlers = {
-            ["textDocument/publishDiagnostics"] = function() end
-        }
+            ["textDocument/publishDiagnostics"] = function() end,
+            ["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+                border = "rounded",
+                max_width = 80,
+                max_height = 20
+            })
+        },
+        on_attach = function(client, bufnr)
+            vim.keymap.set('n', 'K', require("hover").hover, { desc = "hover.nvim" })
+            vim.keymap.set('n', 'gK', require("hover").hover_select, { desc = "hover.nvim (select)" })
+        end
     })
 end
+
+require("hover").setup({
+    init = function()
+        require("hover.providers.lsp")
+        require("hover.providers.gh")
+        require("hover.providers.man")
+    end,
+    preview_opts = {
+        border = 'rounded',
+        title = true
+    }
+})
+
+-- Add an additional keymap to exit hover more easily
+vim.keymap.set('n', '<leader>q', function()
+    vim.api.nvim_win_close(0, true)
+end, { desc = "Close hover window" })
 EOF
 
 
@@ -380,6 +410,28 @@ cmp.setup({
 })
 EOF
 
+
+" Configure Autocompletion
+lua << EOF
+local cmp = require("cmp")
+cmp.setup({
+    mapping = {
+        ["<C-Space>"] = cmp.mapping.complete(),
+        ["<CR>"] = cmp.mapping.confirm({ select = true }),
+    },
+    sources = {
+        { name = "nvim_lsp" },
+        { name = "luasnip" },
+    },
+    snippet = {
+        expand = function(args)
+            require("luasnip").lsp_expand(args.body)
+        end,
+    },
+})
+EOF
+
+
 " COMMENTS NVIM
 lua << EOF
 require('Comment').setup()
@@ -393,3 +445,12 @@ vnoremap <C-/> :lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<
 
 " Map Ctrl + / to comment the current line in Insert mode
 inoremap <C-/> <Esc>:lua require('Comment.api').toggle.linewise.current()<CR>gi
+
+
+autocmd CursorHold * lua vim.lsp.buf.hover()
+set updatetime=1000  " Reduce delay for hover popup (default is 4000ms)
+
+lua << EOF
+require("lspsaga").setup({})
+EOF
+
