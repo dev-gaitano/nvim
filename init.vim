@@ -141,6 +141,8 @@ Plug 'glepnir/lspsaga.nvim'           " UI Enhancements for LSP
 
 Plug 'lewis6991/hover.nvim'
 
+Plug 'lukas-reineke/indent-blankline.nvim' " Indentation Guides
+
 call plug#end()
 
 
@@ -383,35 +385,14 @@ require("hover").setup({
     }
 })
 
--- Add an additional keymap to exit hover more easily
+-- Exit hover more easily
 vim.keymap.set('n', '<leader>q', function()
     vim.api.nvim_win_close(0, true)
 end, { desc = "Close hover window" })
 EOF
 
 
-" Configure Autocompletion
-lua << EOF
-local cmp = require("cmp")
-cmp.setup({
-    mapping = {
-        ["<C-Space>"] = cmp.mapping.complete(),
-        ["<CR>"] = cmp.mapping.confirm({ select = true }),
-    },
-    sources = {
-        { name = "nvim_lsp" },
-        { name = "luasnip" },
-    },
-    snippet = {
-        expand = function(args)
-            require("luasnip").lsp_expand(args.body)
-        end,
-    },
-})
-EOF
-
-
-" Configure Autocompletion
+" LSP Autocompletion
 lua << EOF
 local cmp = require("cmp")
 cmp.setup({
@@ -450,7 +431,15 @@ inoremap <C-/> <Esc>:lua require('Comment.api').toggle.linewise.current()<CR>gi
 autocmd CursorHold * lua vim.lsp.buf.hover()
 set updatetime=1000  " Reduce delay for hover popup (default is 4000ms)
 
+
 lua << EOF
 require("lspsaga").setup({})
+EOF
+
+lua << EOF
+require("ibl").setup {
+    indent = { char = "│" },  -- Use the vertical line character
+    scope = { show_start = false, show_end = false } -- Remove underline under parent
+}
 EOF
 
