@@ -80,6 +80,8 @@ nnoremap <S-Right> :vertical resize +5<CR>
 nnoremap <S-Up>    :resize +5<CR>
 nnoremap <S-Down>  :resize -5<CR>
 
+" Browser-sync (works like live server)
+nnoremap <leader>bs :!browser-sync start --server --files "*.html, css/*.css, js/*.js" &<CR>
 
 call plug#begin('~/.local/share/nvim/site/plugged')
 
@@ -142,6 +144,22 @@ Plug 'glepnir/lspsaga.nvim'           " UI Enhancements for LSP
 Plug 'lewis6991/hover.nvim'
 
 Plug 'lukas-reineke/indent-blankline.nvim' " Indentation Guides
+
+Plug 'NvChad/nvim-colorizer.lua'      " Highlight Tailwind CSS colors
+
+" TailwindCSS Autocompletion
+
+Plug 'hrsh7th/nvim-cmp'
+
+Plug 'hrsh7th/cmp-nvim-lsp'
+
+Plug 'neovim/nvim-lspconfig'
+
+Plug 'roobert/tailwindcss-colorizer-cmp.nvim' " Show colors in preview
+
+Plug 'rafamadriz/friendly-snippets'   " Django Snippets
+
+Plug 'tweekmonster/django-plus.vim'   " Django Template Syntax Highlighting
 
 call plug#end()
 
@@ -389,6 +407,21 @@ require("hover").setup({
 vim.keymap.set('n', '<leader>q', function()
     vim.api.nvim_win_close(0, true)
 end, { desc = "Close hover window" })
+
+-- Django LSP Setup
+lspconfig.pylsp.setup{
+  settings = {
+    pylsp = {
+      plugins = {
+        jedi_completion = { enabled = true },
+        jedi_definition = { enabled = true },
+        pyflakes = { enabled = true },
+        pylint = { enabled = false },  -- Set to true if you want Pylint
+        django_lsp = { enabled = true }
+      }
+    }
+  }
+}
 EOF
 
 
@@ -436,6 +469,8 @@ lua << EOF
 require("lspsaga").setup({})
 EOF
 
+
+" INDENT-BLACKLINE
 lua << EOF
 require("ibl").setup {
     indent = { char = "│" },  -- Use the vertical line character
@@ -443,3 +478,41 @@ require("ibl").setup {
 }
 EOF
 
+
+" NVIM-COLORIZER
+lua require'colorizer'.setup()
+
+
+" TailwindCSS Autocompletion
+lua << EOF
+require'lspconfig'.tailwindcss.setup{}
+EOF
+
+
+" TAILWINDCSS-COLORIZER-CMP
+lua require'tailwindcss-colorizer-cmp'.setup()
+
+
+" Enable Tab to navigate completion
+lua << EOF
+local cmp = require'cmp'
+cmp.setup({
+  mapping = {
+    ['<Tab>'] = cmp.mapping.select_next_item(),
+    ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<Esc>'] = cmp.mapping.close(),
+  },
+})
+EOF
+
+
+" FRIENDLY-SNIPPETS
+lua << EOF
+require("luasnip.loaders.from_vscode").lazy_load()
+EOF
+
+
+" DJANGO-PLUS
+autocmd BufNewFile,BufRead *.html set filetype=htmldjango
