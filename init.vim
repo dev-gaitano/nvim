@@ -1,4 +1,4 @@
-" Line Numbers
+" Line Numbers set number
 set number
 set relativenumber
 
@@ -11,19 +11,28 @@ set textwidth=80
 " Display
 set cmdheight=2
 set signcolumn=yes
+set nowrap
+set termguicolors
+set scrolloff=8
+set colorcolumn=80
+set signcolumn=yes
 
 " Performance
-set updatetime=300
+set updatetime=50
 set shortmess+=c
 
 " Files
 set nobackup
 set nowritebackup
+set noswapfile
+let &undodir = expand("$HOME/.vim/undodir")
+set undofile
+set isfname+=@-@
 
 " Search
 set hidden
 set incsearch
-set hlsearch
+set nohlsearch
 
 " Syntax
 syntax on
@@ -48,9 +57,12 @@ autocmd FileType typescriptreact setlocal tabstop=2 shiftwidth=2 softtabstop=2 e
 autocmd FileType javascriptreact setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
 
-" Exit insert mode with 'j+k'
-inoremap jk <ESC>
 
+"SYSTEM REMAPS
+" Exit mode with 'j+k'
+inoremap jk <ESC>       " Works in insert mode"
+vnoremap jk <ESC>       " Works in Visual Mode
+tnoremap jk <C-\><C-n>  " Works in Terminal Mode 
 
 " Use Ctrl + Tab / Ctrl + Shift + Tab to switch tabs
 nnoremap <C-t>   :tabnext<CR>
@@ -83,41 +95,74 @@ nnoremap <S-Down>  :resize -5<CR>
 " Browser-sync (works like live server)
 nnoremap <leader>bs :!browser-sync start --server --files "*.html, css/*.css, js/*.js" &<CR>
 
+" Move highlighted block
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+" Keeps cursor at line start 
+nnoremap J mzJ`z
+
+" Keeps cursor centered on the screen
+nnoremap <C-d> <C-d>zz
+nnoremap <C-u> <C-u>zz
+
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
+" Pastes the yanked text over the highlighted one without the highlighted one storing in the buffer
+xnoremap <leader>p "_dP
+
+" Seperate vim clipboard and system clipboard
+nnoremap <leader>y "+y
+vnoremap <leader>y "+y
+nnoremap <leader>Y "+Y
+
+" Open a new tmux session silently
+nnoremap <C-f> :silent !tmux neww tmux-sessionizer<CR>
+
+" Disable the Q command
+nnoremap Q <nop>
+
+" Format using LSP
+nnoremap <leader>f :lua vim.lsp.buf.format()<CR>
+
+" initiates a search-and-replace operation in the whole file
+nnoremap <leader>s :%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left>
+
+
+
+" PLUGINS
 call plug#begin('~/.local/share/nvim/site/plugged')
 
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'neoclide/coc.nvim', {'branch': 'release'} " Conqueror of Completion
 
-Plug 'nvim-tree/nvim-tree.lua'  	" File tree
+Plug 'nvim-tree/nvim-tree.lua'        " File tree
 
-Plug 'nvim-tree/nvim-web-devicons'  	" File Icons
+Plug 'nvim-tree/nvim-web-devicons'    " Icons
 
-Plug 'airblade/vim-gitgutter'
+Plug 'airblade/vim-gitgutter'         " Displays git diff markers in the gutter
 
-Plug 'ctrlpvim/ctrlp.vim'
+Plug 'scrooloose/nerdcommenter'       " Enables quick commenting in code
 
-Plug 'scrooloose/nerdcommenter'
+Plug 'christoomey/vim-tmux-navigator' " Navigation between Vim and Tmux splits 
 
-Plug 'christoomey/vim-tmux-navigator'
+Plug 'nvim-lua/plenary.nvim'          " Lua utility library ( Required by many modern Neovim plugins )
 
-Plug 'nvim-lua/plenary.nvim' 
+Plug 'nvim-lua/popup.nvim'            " Lua popup UI library ( Required by plugins that display floating windows )
 
-Plug 'nvim-lua/popup.nvim' 
+Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' } " Fuzzy File Finder
 
-Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
+Plug 'vim-airline/vim-airline'        " Status bar customization
 
-Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes' " Vim Airline themes
 
-Plug 'vim-airline/vim-airline-themes'
+Plug 'dense-analysis/ale'             " Linting Engine
 
-Plug 'dense-analysis/ale'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'} " Syntax Highlighting
 
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'folke/tokyonight.nvim'          " Tokyonight colorscheme
 
-Plug 'folke/tokyonight.nvim'
-
-Plug 'tpope/vim-fugitive'
-
-Plug 'airblade/vim-gitgutter'
+Plug 'tpope/vim-fugitive'             " Git Wrapper Plugin
 
 Plug 'neovim/nvim-lspconfig'          " Core LSP support
 
@@ -125,9 +170,9 @@ Plug 'williamboman/mason.nvim'        " Easy LSP installation
 
 Plug 'williamboman/mason-lspconfig.nvim' " Bridge between Mason and lspconfig
 
-Plug 'hrsh7th/nvim-cmp'               " Autocompletion engine
+Plug 'hrsh7th/nvim-cmp'               " Core autocompletion engine
 
-Plug 'hrsh7th/cmp-nvim-lsp'           " LSP completion source
+Plug 'hrsh7th/cmp-nvim-lsp'           " Integrates nvim-cmp with Neovim's built-in LSP
 
 Plug 'hrsh7th/cmp-buffer'             " Buffer completion
 
@@ -137,31 +182,28 @@ Plug 'saadparwaiz1/cmp_luasnip'       " Snippet completion
 
 Plug 'L3MON4D3/LuaSnip'               " Snippet engine
 
-Plug 'numToStr/Comment.nvim'          " Code Comments
-
 Plug 'glepnir/lspsaga.nvim'           " UI Enhancements for LSP
 
-Plug 'lewis6991/hover.nvim'
+Plug 'lewis6991/hover.nvim'           " Add hover properties
 
-Plug 'lukas-reineke/indent-blankline.nvim' " Indentation Guides
+Plug 'lukas-reineke/indent-blankline.nvim' " Indentation Guidelines
 
-Plug 'NvChad/nvim-colorizer.lua'      " Highlight Tailwind CSS colors
+Plug 'NvChad/nvim-colorizer.lua'      " Highlight colors
 
-" TailwindCSS Autocompletion
-
-Plug 'hrsh7th/nvim-cmp'
-
-Plug 'hrsh7th/cmp-nvim-lsp'
-
-Plug 'neovim/nvim-lspconfig'
-
-Plug 'roobert/tailwindcss-colorizer-cmp.nvim' " Show colors in preview
+Plug 'roobert/tailwindcss-colorizer-cmp.nvim' " Show TailwindCSS colors in preview
 
 Plug 'rafamadriz/friendly-snippets'   " Django Snippets
 
 Plug 'tweekmonster/django-plus.vim'   " Django Template Syntax Highlighting
 
+Plug 'ThePrimeagen/harpoon'           " Harpoon File Navigator
+
+Plug 'mbbill/undotree'                " Undo Tree
+
+Plug 'ThePrimeagen/vim-be-good'       " Vim Practice Game
+
 call plug#end()
+
 
 
 " COC CONFIG
@@ -171,6 +213,23 @@ let g:coc_global_extensions = [
   \ 'coc-prettier', 
   \ 'coc-json', 
   \ ]
+
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
+" Coc only does snippet and additional edit on confirm.
+inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+
+" Or use `complete_info` if your vim support it, like:
+" inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Remap for rename current word
+nmap <F2> <Plug>(coc-rename)
+
 
 
 " NVIM TREE & NVIM WEB ICONS
@@ -255,6 +314,7 @@ EOF
 nnoremap <C-b> :NvimTreeToggle<CR>
 
 
+
 " VIM-PRETTIER
 "let g:prettier#quickfix_enabled = 0
 "let g:prettier#quickfix_auto_focus = 0
@@ -264,26 +324,6 @@ command! -nargs=0 Prettier :CocCommand prettier.formatFile
 "let g:prettier#autoformat = 0
 "autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue,*.yaml,*.html PrettierAsync
 
-
-" CTRLP
-let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
-
-
-" Use <c-space> to trigger completion.
-inoremap <silent><expr> <c-space> coc#refresh()
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
-" Coc only does snippet and additional edit on confirm.
-inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-" Or use `complete_info` if your vim support it, like:
-" inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
-
-
-" Highlight symbol under cursor on CursorHold
-autocmd CursorHold * silent call CocActionAsync('highlight')
-
-
-" Remap for rename current word
-nmap <F2> <Plug>(coc-rename)
 
 
 " TELESCOPE
@@ -300,11 +340,13 @@ nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
 
 
+
 " VIM-AIRLINE
 " let g:airline_theme='jellybeans'
 let g:airline_theme='luna'
 let g:airline#extensions#branch#enabled = 1
 let g:airline#extensions#hunks#enabled = 1
+
 
 
 " ALE (Asynchronous Lint Engine)
@@ -342,6 +384,7 @@ let g:ale_javascript_prettier_use_global = 1
 let g:ale_javascript_eslint_options = '--config ~/.eslintrc.js'
 
 
+
 " TREESITTER
 lua << EOF
 require('nvim-treesitter.configs').setup({
@@ -353,14 +396,29 @@ require('nvim-treesitter.configs').setup({
 EOF
 
 
+
 " TOKYONIGHT COLORSHCEME
 lua << EOF
 require("tokyonight").setup({
     style = "night",  -- Options: "night", "storm", "day", "moon"
+    transparent = true,  -- Enable transparency
+    styles = {
+        sidebars = "transparent",
+        floats = "transparent",
+    },
 })
+
+-- Ensure background transparency for UI elements
+vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
+vim.api.nvim_set_hl(0, "NonText", { bg = "none" })
+vim.api.nvim_set_hl(0, "LineNr", { bg = "none" })
+vim.api.nvim_set_hl(0, "Folded", { bg = "none" })
+vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none" })
 EOF
 
 colorscheme tokyonight
+
 
 
 " LSP
@@ -422,11 +480,8 @@ lspconfig.pylsp.setup{
     }
   }
 }
-EOF
 
-
-" LSP Autocompletion
-lua << EOF
+-- LSP Autocompletion
 local cmp = require("cmp")
 cmp.setup({
     mapping = {
@@ -445,11 +500,6 @@ cmp.setup({
 })
 EOF
 
-
-" COMMENTS NVIM
-lua << EOF
-require('Comment').setup()
-EOF
 
 " Map Ctrl + / to comment a line in Normal mode
 nnoremap <C-/> :lua require('Comment.api').toggle.linewise.current()<CR>
@@ -470,6 +520,7 @@ require("lspsaga").setup({})
 EOF
 
 
+
 " INDENT-BLACKLINE
 lua << EOF
 require("ibl").setup {
@@ -479,8 +530,10 @@ require("ibl").setup {
 EOF
 
 
+
 " NVIM-COLORIZER
 lua require'colorizer'.setup()
+
 
 
 " TailwindCSS Autocompletion
@@ -516,3 +569,19 @@ EOF
 
 " DJANGO-PLUS
 autocmd BufNewFile,BufRead *.html set filetype=htmldjango
+
+
+" HARPOON
+nnoremap <leader>a :lua require("harpoon.mark").add_file()<CR>
+nnoremap <leader>e :lua require("harpoon.ui").toggle_quick_menu()<CR>
+nnoremap <leader>1 :lua require("harpoon.ui").nav_file(1)<CR>
+nnoremap <leader>2 :lua require("harpoon.ui").nav_file(2)<CR>
+nnoremap <leader>3 :lua require("harpoon.ui").nav_file(3)<CR>
+nnoremap <leader>4 :lua require("harpoon.ui").nav_file(4)<CR>
+
+
+" UNDOTREE
+let g:undotree_SetFocusWhenToggle = 1
+
+" Toggle undotree
+nnoremap <leader>u :UndotreeToggle<CR>
