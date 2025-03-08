@@ -1,14 +1,15 @@
+" Leader key
+let mapleader = "\<Space>"
+
 " Line Numbers set number
 set number
 set relativenumber
 
-" Indentation and Wrapping
+" Display, indentation and Wrapping
 set autoindent
 set smarttab
 set cindent
 set textwidth=80
-
-" Display
 set cmdheight=2
 set signcolumn=yes
 set nowrap
@@ -81,7 +82,7 @@ nnoremap <A-Up>    :aboveleft split<CR>
 nnoremap <A-Right> :vsplit<CR>
 
 " Use Ctrl+` to open terminal
-nnoremap <S-n> :belowright split<CR>:terminal<CR>
+nnoremap <C-p> :belowright split<CR>:terminal<CR>
 
 " Remap terminal exit shortcut
 tnoremap <Esc> <C-\><C-n>
@@ -245,13 +246,9 @@ require("nvim-web-devicons").setup({
     ts = { icon = "", color = "#519aba", name = "Ts" },
     py = { icon = "", color = "#3572A5", name = "Py" },
     java = { icon = "", color = "#cc3e44", name = "Java" },
-    html = { icon = "", color = "#e34c26", name = "Html" },
-    css = { icon = "", color = "#563d7c", name = "Css" },
---    json = { icon = "", color = "#cbcb41", name = "Json" },
     lock = { icon = "󰌾", color = "#ff0000", name = "Lock" },
     yml = { icon = "פּ", color = "#6d8086", name = "Yml" },
     yaml = { icon = "פּ", color = "#6d8086", name = "Yaml" },
-    txt = { icon = "", color = "#6d8086", name = "Txt" },
     sh = { icon = "", color = "#4d5a5e", name = "Sh" },
     sql = { icon = "", color = "#ffd700", name = "Sql" },
     db = { icon = "", color = "#ffd700", name = "Db" },
@@ -261,7 +258,6 @@ require("nvim-web-devicons").setup({
     mysql = { icon = "", color = "#00758f", name = "Mysql" },
     mongodb = { icon = "", color = "#589636", name = "Mongodb" },
     map = { icon = "󰆑", color = "#cbcb41", name = "Map" },
-    md = { icon = "󰽛", color = "#519aba", name = "Md" },
   },
   default = true,
 })
