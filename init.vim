@@ -203,6 +203,8 @@ Plug 'mbbill/undotree'                " Undo Tree
 
 Plug 'ThePrimeagen/vim-be-good'       " Vim Practice Game
 
+Plug 'github/copilot.vim'	      " AI Copilot
+
 call plug#end()
 
 
@@ -445,6 +447,18 @@ for _, server in pairs(servers) do
     })
 end
 
+require('lspconfig').pylsp.setup {
+    settings = {
+        pylsp = {
+            plugins = {
+                rope_autoimport = { enabled = true },
+                rope_completion = { enabled = true },
+                rope_rename = { enabled = true }
+            }
+        }
+    }
+}
+
 require("hover").setup({
     init = function()
         require("hover.providers.lsp")
@@ -581,3 +595,7 @@ let g:undotree_SetFocusWhenToggle = 1
 
 " Toggle undotree
 nnoremap <leader>u :UndotreeToggle<CR>
+
+
+" GITHUB COPILOT
+let g:copilot_enabled = v:true

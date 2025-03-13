@@ -19,5 +19,8 @@
         }
       }
     }
-  }
+  },
+  "python.pythonPath": "/home/gaitano/.local/share/nvim/mason/packages/python-lsp-server/venv/bin/python",
+  "python.linting.enabled": true,
+  "python.analysis.typeCheckingMode": "basic"
 }
