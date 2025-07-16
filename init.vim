@@ -167,9 +167,9 @@ Plug 'tpope/vim-fugitive'             " Git Wrapper Plugin
 
 Plug 'neovim/nvim-lspconfig'          " Core LSP support
 
-Plug 'williamboman/mason.nvim'        " Easy LSP installation
+Plug 'mason-org/mason.nvim'        " Easy LSP installation
 
-Plug 'williamboman/mason-lspconfig.nvim' " Bridge between Mason and lspconfig
+Plug 'mason-org/mason-lspconfig.nvim' " Bridge between Mason and lspconfig
 
 Plug 'hrsh7th/nvim-cmp'               " Core autocompletion engine
 
@@ -422,16 +422,16 @@ colorscheme tokyonight
 " LSP
 lua << EOF
 require("mason").setup()
-require("mason-lspconfig").setup({
+require("mason-lspconfig").setup {
     ensure_installed = { "pyright", "ts_ls", "html", "cssls", "lua_ls" },
-    automatic_installation = true,
-})
+    automatic_installation = false,
+}
 
 local lspconfig = require("lspconfig")
 local servers = { "pyright", "ts_ls", "html", "cssls", "lua_ls" }
 
-for _, server in pairs(servers) do
-    lspconfig[server].setup({
+for _, server in ipairs(servers) do
+  vim.lsp.config[server].setup = {
         handlers = {
             ["textDocument/publishDiagnostics"] = function() end,
             ["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
@@ -444,7 +444,7 @@ for _, server in pairs(servers) do
             vim.keymap.set('n', 'K', require("hover").hover, { desc = "hover.nvim" })
             vim.keymap.set('n', 'gK', require("hover").hover_select, { desc = "hover.nvim (select)" })
         end
-    })
+    }
 end
 
 require('lspconfig').pylsp.setup {
