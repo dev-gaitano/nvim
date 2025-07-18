@@ -167,7 +167,7 @@ Plug 'tpope/vim-fugitive'             " Git Wrapper Plugin
 
 Plug 'neovim/nvim-lspconfig'          " Core LSP support
 
-Plug 'mason-org/mason.nvim'        " Easy LSP installation
+Plug 'mason-org/mason.nvim'           " Easy LSP installation
 
 Plug 'mason-org/mason-lspconfig.nvim' " Bridge between Mason and lspconfig
 
@@ -204,6 +204,10 @@ Plug 'mbbill/undotree'                " Undo Tree
 Plug 'ThePrimeagen/vim-be-good'       " Vim Practice Game
 
 Plug 'github/copilot.vim'	      " AI Copilot
+
+Plug 'MeanderingProgrammer/render-markdown.nvim' " Render markdown syntax
+
+Plug 'code-biscuits/nvim-biscuits'
 
 call plug#end()
 
@@ -246,6 +250,7 @@ require("nvim-web-devicons").setup({
   override = {
     js = { icon = "", color = "#cbcb41", name = "Js" },
     ts = { icon = "", color = "#519aba", name = "Ts" },
+    css = { icon = "", color = "#336791", name = "Css" },
     py = { icon = "", color = "#3572A5", name = "Py" },
     java = { icon = "", color = "#cc3e44", name = "Java" },
     lock = { icon = "󰌾", color = "#ff0000", name = "Lock" },
@@ -386,9 +391,9 @@ let g:ale_javascript_eslint_options = '--config ~/.eslintrc.js'
 " TREESITTER
 lua << EOF
 require('nvim-treesitter.configs').setup({
-    ensure_installed = { "python", "javascript", "typescript", "tsx", "lua", "bash", "json", "html", "css" }, -- Add your languages here
+    ensure_installed = { "python", "javascript", "typescript", "tsx", "lua", "bash", "json", "html", "css", "markdown", "markdown_inline" },
     highlight = {
-        enable = true, -- Enable syntax highlighting
+        enable = true, 
     },
 })
 EOF
@@ -599,3 +604,19 @@ nnoremap <leader>u :UndotreeToggle<CR>
 
 " GITHUB COPILOT
 let g:copilot_enabled = v:true
+
+
+" RENDER MARKDOWN
+autocmd BufReadPost *.md :RenderMarkdown
+
+
+" NVIM BISCUITS
+lua <<EOF
+require("nvim-biscuits").setup({
+  default_config = {
+    max_length = 40,
+    min_distance = 10,
+    prefix_string = " ⤷ ",
+  },
+})
+EOF
