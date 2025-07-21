@@ -207,9 +207,31 @@ Plug 'github/copilot.vim'	      " AI Copilot
 
 Plug 'MeanderingProgrammer/render-markdown.nvim' " Render markdown syntax
 
-Plug 'code-biscuits/nvim-biscuits'
+Plug 'code-biscuits/nvim-biscuits'    " Show code context in the gutter
+
+Plug 'epwalsh/obsidian.nvim'          " Obsidian integration for Neovim
+
+Plug 'CopilotC-Nvim/CopilotChat.nvim'
 
 call plug#end()
+
+
+
+" OBSIDIAN NVIM
+autocmd BufRead,BufNewFile ~/Desktop/sftw/obsidian/*/*.md setlocal conceallevel=2
+
+nnoremap <leader>op :lua require("obsidianPreview").preview_link()<CR>
+
+lua << EOF
+require("obsidian").setup({
+  workspaces = {
+    {
+      name = "gaitanos_mind",
+      path = "~/Desktop/sftw/obsidian/gaitanos_mind",
+    },
+  }
+})
+EOF
 
 
 
