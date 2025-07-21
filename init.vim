@@ -143,7 +143,7 @@ Plug 'nvim-tree/nvim-web-devicons'    " Icons
 
 Plug 'airblade/vim-gitgutter'         " Displays git diff markers in the gutter
 
-Plug 'scrooloose/nerdcommenter'       " Enables quick commenting in code
+Plug 'preservim/nerdcommenter'        " Enables quick commenting in code
 
 Plug 'christoomey/vim-tmux-navigator' " Navigation between Vim and Tmux splits 
 
@@ -450,15 +450,15 @@ colorscheme tokyonight
 lua << EOF
 require("mason").setup()
 require("mason-lspconfig").setup {
-    ensure_installed = { "pyright", "ts_ls", "html", "cssls", "lua_ls" },
+    ensure_installed = { "pyright", "ts_ls", "html", "cssls", "lua_ls", "vimls" },
     automatic_installation = false,
 }
 
 local lspconfig = require("lspconfig")
-local servers = { "pyright", "ts_ls", "html", "cssls", "lua_ls" }
+local servers = { "pyright", "ts_ls", "html", "cssls", "lua_ls", "vimls" }
 
 for _, server in ipairs(servers) do
-  vim.lsp.config[server].setup = {
+  require("lspconfig")[server].setup {
         handlers = {
             ["textDocument/publishDiagnostics"] = function() end,
             ["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
