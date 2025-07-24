@@ -205,13 +205,19 @@ Plug 'ThePrimeagen/vim-be-good'       " Vim Practice Game
 
 Plug 'github/copilot.vim'	      " AI Copilot
 
+Plug 'CopilotC-Nvim/CopilotChat.nvim' " Copilot Chat integration
+
 Plug 'MeanderingProgrammer/render-markdown.nvim' " Render markdown syntax
 
 Plug 'code-biscuits/nvim-biscuits'    " Show code context in the gutter
 
 Plug 'epwalsh/obsidian.nvim'          " Obsidian integration for Neovim
 
-Plug 'CopilotC-Nvim/CopilotChat.nvim'
+Plug 'stevearc/conform.nvim'	      " Code formatting plugin
+
+Plug 'folke/zen-mode.nvim'	      " Zen mode
+
+Plug 'folke/twilight.nvim'	      " Dim inactive portions of the code
 
 call plug#end()
 
@@ -346,8 +352,7 @@ nnoremap <C-b> :NvimTreeToggle<CR>
 " prettier command for coc
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
 " run prettier on save
-"let g:prettier#autoformat = 0
-"autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue,*.yaml,*.html PrettierAsync
+let g:prettier#autoformat = 1
 
 
 
@@ -688,3 +693,82 @@ require("CopilotChat").setup {
   },
 }
 EOF
+
+
+
+" CONFORM
+lua << EOF
+require("conform").setup({
+  format_on_save = {
+    lsp_fallback = true,
+    timeout_ms = 500,
+  },
+  formatters_by_ft = {
+    javascript      = { "prettier" },
+    javascriptreact = { "prettier" },
+    typescript      = { "prettier" },
+    typescriptreact = { "prettier" },
+    mjs             = { "prettier" },
+    css             = { "prettier" },
+    less            = { "prettier" },
+    scss            = { "prettier" },
+    json            = { "prettier" },
+    graphql         = { "prettier" },
+    markdown        = { "prettier" },
+    vue             = { "prettier" },
+    yaml            = { "prettier" },
+    html            = { "prettier" },
+  },
+})
+EOF
+
+
+" ZEN MODE
+lua << EOF
+require("zen-mode").setup({
+  window = {
+    width = .8
+  },
+  plugins = {
+    options = {
+      enabled = true,
+      ruler = false, -- disables the ruler text in the cmd line area
+      showcmd = false, -- disables the command in the last line of the screen
+      laststatus = 0, -- turn off the statusline in zen mode
+    },
+    twilight = { enabled = true }, -- enable to start Twilight when zen mode opens
+    gitsigns = { enabled = false }, -- disables git signs
+    tmux = { enabled = false }, -- disables the tmux statusline
+    todo = { enabled = false }, -- if set to "true", todo-comments.nvim highlights will be disabled
+    kitty = {
+      enabled = false,
+      font = "+5", -- font size increment
+    },
+  }
+})
+EOF
+
+nnoremap <leader>z :lua require("zen-mode").toggle()<CR>
+
+
+
+" TWILIGHT
+lua << EOF
+require("twilight").setup({
+  dimming = {
+    alpha = 0.25, -- amount of dimming
+    color = { "Normal", "#ffffff" }, -- fallback color
+  },
+  context = 10, -- show lines around the current one
+  treesitter = true, -- use Treesitter when available
+  expand = { -- expand these node types
+    "function",
+    "method",
+    "table",
+    "if_statement",
+  },
+  exclude = {}, -- filetypes to exclude
+})
+EOF
+
+nnoremap <leader>t :lua require("twilight").toggle()<CR>
