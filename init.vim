@@ -219,6 +219,10 @@ Plug 'folke/zen-mode.nvim'	      " Zen mode
 
 Plug 'folke/twilight.nvim'	      " Dim inactive portions of the code
 
+Plug 'folke/todo-comments.nvim'	      " Highlight TODO comments
+
+"Plug 'sitiom/nvim-numbertoggle'	      " Toggle between relative and absolute line numbers
+
 call plug#end()
 
 
@@ -727,7 +731,7 @@ EOF
 lua << EOF
 require("zen-mode").setup({
   window = {
-    width = .8
+    width = .5
   },
   plugins = {
     options = {
@@ -736,13 +740,13 @@ require("zen-mode").setup({
       showcmd = false, -- disables the command in the last line of the screen
       laststatus = 0, -- turn off the statusline in zen mode
     },
-    twilight = { enabled = true }, -- enable to start Twilight when zen mode opens
-    gitsigns = { enabled = false }, -- disables git signs
-    tmux = { enabled = false }, -- disables the tmux statusline
-    todo = { enabled = false }, -- if set to "true", todo-comments.nvim highlights will be disabled
+    twilight = { enabled = true },
+    gitsigns = { enabled = false },
+    tmux = { enabled = false },
+    todo = { enabled = false },
     kitty = {
       enabled = false,
-      font = "+5", -- font size increment
+      font = "+5",
     },
   }
 })
@@ -759,16 +763,75 @@ require("twilight").setup({
     alpha = 0.25, -- amount of dimming
     color = { "Normal", "#ffffff" }, -- fallback color
   },
-  context = 10, -- show lines around the current one
+  context = 20,
   treesitter = true, -- use Treesitter when available
-  expand = { -- expand these node types
+  expand = {
     "function",
     "method",
     "table",
     "if_statement",
   },
-  exclude = {}, -- filetypes to exclude
+  exclude = {},
 })
 EOF
 
 nnoremap <leader>t :lua require("twilight").toggle()<CR>
+
+
+
+" TODO COMMENTS
+lua << EOF
+require("todo-comments").setup {
+  signs = true,
+  sign_priority = 8,
+  keywords = {
+    FIX = {
+      icon = " ",
+      color = "error",
+      alt = { "FIXME", "BUG", "FIXIT", "ISSUE" },
+    },
+    TODO = { icon = " ", color = "info" },
+    HACK = { icon = " ", color = "warning" },
+    WARN = { icon = " ", color = "warning", alt = { "WARNING", "XXX" } },
+    PERF = { icon = " ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
+    NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
+    TEST = { icon = "⏲ ", color = "test", alt = { "TESTING", "PASSED", "FAILED" } },
+  },
+  gui_style = {
+    fg = "NONE",
+    bg = "BOLD",
+  },
+  merge_keywords = true,
+  highlight = {
+    multiline = true,
+    multiline_pattern = "^.",
+    multiline_context = 10,
+    before = "",
+    keyword = "wide",
+    after = "fg",
+    pattern = [[.*<(KEYWORDS)\s*:]],
+    comments_only = true,
+    max_line_len = 400,
+    exclude = {},
+  },
+  colors = {
+    error = { "DiagnosticError", "ErrorMsg", "#DC2626" },
+    warning = { "DiagnosticWarn", "WarningMsg", "#FBBF24" },
+    info = { "DiagnosticInfo", "#2563EB" },
+    hint = { "DiagnosticHint", "#10B981" },
+    default = { "Identifier", "#7C3AED" },
+    test = { "Identifier", "#FF00FF" },
+  },
+  search = {
+    command = "rg",
+    args = {
+      "--color=never",
+      "--no-heading",
+      "--with-filename",
+      "--line-number",
+      "--column",
+    },
+    pattern = [[\b(KEYWORDS):]],
+  },
+}
+EOF
