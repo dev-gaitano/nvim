@@ -760,7 +760,7 @@ nnoremap <leader>z :lua require("zen-mode").toggle()<CR>
 lua << EOF
 require("twilight").setup({
   dimming = {
-    alpha = 0.25, -- amount of dimming
+    alpha = 0.50,
     color = { "Normal", "#ffffff" }, -- fallback color
   },
   context = 20,
