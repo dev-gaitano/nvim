@@ -649,6 +649,7 @@ require("nvim-biscuits").setup({
     min_distance = 10,
     prefix_string = " ⤷ ",
   },
+  cursor_line_only = true,
 })
 EOF
 
