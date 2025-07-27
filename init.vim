@@ -1,4 +1,4 @@
-" Leader key
+" BASE SETTINGS
 let mapleader = "\<Space>"
 
 " Line Numbers set number
@@ -11,7 +11,6 @@ set smarttab
 set cindent
 set textwidth=80
 set cmdheight=2
-set signcolumn=yes
 set nowrap
 set termguicolors
 set scrolloff=8
@@ -19,7 +18,6 @@ set colorcolumn=80
 set signcolumn=yes
 
 " Performance
-set updatetime=50
 set shortmess+=c
 
 " Files
@@ -41,22 +39,9 @@ syntax on
 " Color Scheme
 " colorscheme habamax
 
-
 " Filetype Specific Settings 
 autocmd FileType python setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
-
-autocmd FileType html setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-
-autocmd FileType css setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-
-autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-
-autocmd FileType typescript setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-
-autocmd FileType typescriptreact setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-
-autocmd FileType javascriptreact setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-
+autocmd FileType html,css,javascript,typescript,typescriptreact,javascriptreact setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
 
 "SYSTEM REMAPS
@@ -131,11 +116,8 @@ nnoremap <leader>f :lua vim.lsp.buf.format()<CR>
 nnoremap <leader>s :%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left>
 
 
-
 " PLUGINS
 call plug#begin('~/.local/share/nvim/site/plugged')
-
-Plug 'neoclide/coc.nvim', {'branch': 'release'} " Conqueror of Completion
 
 Plug 'nvim-tree/nvim-tree.lua'        " File tree
 
@@ -148,8 +130,6 @@ Plug 'preservim/nerdcommenter'        " Enables quick commenting in code
 Plug 'christoomey/vim-tmux-navigator' " Navigation between Vim and Tmux splits 
 
 Plug 'nvim-lua/plenary.nvim'          " Lua utility library ( Required by many modern Neovim plugins )
-
-Plug 'nvim-lua/popup.nvim'            " Lua popup UI library ( Required by plugins that display floating windows )
 
 Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' } " Fuzzy File Finder
 
@@ -221,87 +201,13 @@ Plug 'folke/twilight.nvim'	      " Dim inactive portions of the code
 
 Plug 'folke/todo-comments.nvim'	      " Highlight TODO comments
 
-"Plug 'sitiom/nvim-numbertoggle'	      " Toggle between relative and absolute line numbers
+Plug 'jbyuki/venn.nvim'		      " Draw ASCII diagrams
 
 call plug#end()
 
 
-
-" OBSIDIAN NVIM
-autocmd BufRead,BufNewFile ~/Desktop/sftw/obsidian/*/*.md setlocal conceallevel=2
-
-nnoremap <leader>op :lua require("obsidianPreview").preview_link()<CR>
-
+"NVIM TREE
 lua << EOF
-require("obsidian").setup({
-  workspaces = {
-    {
-      name = "gaitanos_mind",
-      path = "~/Desktop/sftw/obsidian/gaitanos_mind",
-    },
-  }
-})
-EOF
-
-
-
-" COC CONFIG
-let g:coc_global_extensions = [
-  \ 'coc-snippets',
-  \ 'coc-pairs',
-  \ 'coc-prettier', 
-  \ 'coc-json', 
-  \ ]
-
-" Use <c-space> to trigger completion.
-inoremap <silent><expr> <c-space> coc#refresh()
-
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
-" Coc only does snippet and additional edit on confirm.
-inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-
-" Or use `complete_info` if your vim support it, like:
-" inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
-
-" Highlight symbol under cursor on CursorHold
-autocmd CursorHold * silent call CocActionAsync('highlight')
-
-" Remap for rename current word
-nmap <F2> <Plug>(coc-rename)
-
-
-
-" NVIM TREE & NVIM WEB ICONS
-lua << EOF
--- Disable netrw (recommended)
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
-
--- Setup nvim-web-devicons
-require("nvim-web-devicons").setup({
-  override = {
-    js = { icon = "", color = "#cbcb41", name = "Js" },
-    ts = { icon = "", color = "#519aba", name = "Ts" },
-    css = { icon = "", color = "#336791", name = "Css" },
-    py = { icon = "", color = "#3572A5", name = "Py" },
-    java = { icon = "", color = "#cc3e44", name = "Java" },
-    lock = { icon = "󰌾", color = "#ff0000", name = "Lock" },
-    yml = { icon = "פּ", color = "#6d8086", name = "Yml" },
-    yaml = { icon = "פּ", color = "#6d8086", name = "Yaml" },
-    sh = { icon = "", color = "#4d5a5e", name = "Sh" },
-    sql = { icon = "", color = "#ffd700", name = "Sql" },
-    db = { icon = "", color = "#ffd700", name = "Db" },
-    sqlite = { icon = "", color = "#ffd700", name = "Sqlite" },
-    sqlite3 = { icon = "", color = "#ffd700", name = "Sqlite3" },
-    postgresql = { icon = "", color = "#336791", name = "Postgresql" },
-    mysql = { icon = "", color = "#00758f", name = "Mysql" },
-    mongodb = { icon = "", color = "#589636", name = "Mongodb" },
-    map = { icon = "󰆑", color = "#cbcb41", name = "Map" },
-  },
-  default = true,
-})
-
--- Setup nvim-tree
 require("nvim-tree").setup({
   view = {
     width = 30,
@@ -311,9 +217,6 @@ require("nvim-tree").setup({
     ignore = false,
     timeout = 500,
   },
---  filters = {
---    custom = { "^node_modules$" },
---  },
   update_focused_file = {
     enable = true,
     update_cwd = true,
@@ -345,42 +248,50 @@ require("nvim-tree").setup({
 })
 EOF
 
-" Keybinding to toggle the file tree
 nnoremap <C-b> :NvimTreeToggle<CR>
 
 
+" NVIM WEB ICONS
+lua << EOF
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 
-" VIM-PRETTIER
-"let g:prettier#quickfix_enabled = 0
-"let g:prettier#quickfix_auto_focus = 0
-" prettier command for coc
-command! -nargs=0 Prettier :CocCommand prettier.formatFile
-" run prettier on save
-let g:prettier#autoformat = 1
-
+require("nvim-web-devicons").setup({
+  override = {
+    js = { icon = "", color = "#cbcb41", name = "Js" },
+    ts = { icon = "", color = "#519aba", name = "Ts" },
+    css = { icon = "", color = "#336791", name = "Css" },
+    py = { icon = "", color = "#3572A5", name = "Py" },
+    java = { icon = "", color = "#cc3e44", name = "Java" },
+    lock = { icon = "󰌾", color = "#ff0000", name = "Lock" },
+    yml = { icon = "פּ", color = "#6d8086", name = "Yml" },
+    yaml = { icon = "פּ", color = "#6d8086", name = "Yaml" },
+    sh = { icon = "", color = "#4d5a5e", name = "Sh" },
+    sql = { icon = "", color = "#ffd700", name = "Sql" },
+    db = { icon = "", color = "#ffd700", name = "Db" },
+    sqlite = { icon = "", color = "#ffd700", name = "Sqlite" },
+    sqlite3 = { icon = "", color = "#ffd700", name = "Sqlite3" },
+    postgresql = { icon = "", color = "#336791", name = "Postgresql" },
+    mysql = { icon = "", color = "#00758f", name = "Mysql" },
+    mongodb = { icon = "", color = "#589636", name = "Mongodb" },
+    map = { icon = "󰆑", color = "#cbcb41", name = "Map" },
+  },
+  default = true,
+})
+EOF
 
 
 " TELESCOPE
-" Find files using Telescope command-line sugar.
-nnoremap <leader>ff <cmd>Telescope find_files<cr>
-nnoremap <leader>fg <cmd>Telescope live_grep<cr>
-nnoremap <leader>fb <cmd>Telescope buffers<cr>
-nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-
-" Using Lua functions
 nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
 nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
 
 
-
 " VIM-AIRLINE
-" let g:airline_theme='jellybeans'
 let g:airline_theme='luna'
 let g:airline#extensions#branch#enabled = 1
 let g:airline#extensions#hunks#enabled = 1
-
 
 
 " ALE (Asynchronous Lint Engine)
@@ -418,7 +329,6 @@ let g:ale_javascript_prettier_use_global = 1
 let g:ale_javascript_eslint_options = '--config ~/.eslintrc.js'
 
 
-
 " TREESITTER
 lua << EOF
 require('nvim-treesitter.configs').setup({
@@ -430,12 +340,11 @@ require('nvim-treesitter.configs').setup({
 EOF
 
 
-
 " TOKYONIGHT COLORSHCEME
 lua << EOF
 require("tokyonight").setup({
     style = "night",  -- Options: "night", "storm", "day", "moon"
-    transparent = true,  -- Enable transparency
+    transparent = true,
     styles = {
         sidebars = "transparent",
         floats = "transparent",
@@ -454,10 +363,14 @@ EOF
 colorscheme tokyonight
 
 
-
-" LSP
+" MASON
 lua << EOF
 require("mason").setup()
+EOF
+
+
+" MASON-LSP
+lua << EOF
 require("mason-lspconfig").setup {
     ensure_installed = { "pyright", "ts_ls", "html", "cssls", "lua_ls", "vimls" },
     automatic_installation = false,
@@ -483,36 +396,7 @@ for _, server in ipairs(servers) do
     }
 end
 
-require('lspconfig').pylsp.setup {
-    settings = {
-        pylsp = {
-            plugins = {
-                rope_autoimport = { enabled = true },
-                rope_completion = { enabled = true },
-                rope_rename = { enabled = true }
-            }
-        }
-    }
-}
-
-require("hover").setup({
-    init = function()
-        require("hover.providers.lsp")
-        require("hover.providers.gh")
-        require("hover.providers.man")
-    end,
-    preview_opts = {
-        border = 'rounded',
-        title = true
-    }
-})
-
--- Exit hover more easily
-vim.keymap.set('n', '<leader>q', function()
-    vim.api.nvim_win_close(0, true)
-end, { desc = "Close hover window" })
-
--- Django LSP Setup
+-- Python LSP Setup
 lspconfig.pylsp.setup{
   settings = {
     pylsp = {
@@ -546,40 +430,30 @@ cmp.setup({
 })
 EOF
 
-
-" Map Ctrl + / to comment a line in Normal mode
-nnoremap <C-/> :lua require('Comment.api').toggle.linewise.current()<CR>
-
-" Map Ctrl + / to comment selected lines in Visual mode
-vnoremap <C-/> :lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>
-
-" Map Ctrl + / to comment the current line in Insert mode
-inoremap <C-/> <Esc>:lua require('Comment.api').toggle.linewise.current()<CR>gi
+"autocmd CursorHold * lua vim.lsp.buf.hover()
+"set updatetime=5000  " Reduce delay for hover popup (default is 4000ms)
+nnoremap K :lua vim.lsp.buf.hover()<CR>
 
 
-autocmd CursorHold * lua vim.lsp.buf.hover()
-set updatetime=1000  " Reduce delay for hover popup (default is 4000ms)
-
-
+" LSPSAGA
 lua << EOF
 require("lspsaga").setup({})
 EOF
 
 
-
 " INDENT-BLACKLINE
 lua << EOF
 require("ibl").setup {
-    indent = { char = "│" },  -- Use the vertical line character
-    scope = { show_start = false, show_end = false } -- Remove underline under parent
+    indent = { char = "│" },
+    scope = { show_start = false, show_end = false }
 }
 EOF
 
 
-
 " NVIM-COLORIZER
-lua require'colorizer'.setup()
-
+lua <<EOF
+require'colorizer'.setup()
+EOF
 
 
 " TailwindCSS Autocompletion
@@ -589,7 +463,9 @@ EOF
 
 
 " TAILWINDCSS-COLORIZER-CMP
-lua require'tailwindcss-colorizer-cmp'.setup()
+lua <<EOF
+require'tailwindcss-colorizer-cmp'.setup()
+EOF
 
 
 " Enable Tab to navigate completion
@@ -613,10 +489,6 @@ require("luasnip.loaders.from_vscode").lazy_load()
 EOF
 
 
-" DJANGO-PLUS
-autocmd BufNewFile,BufRead *.html set filetype=htmldjango
-
-
 " HARPOON
 nnoremap <leader>a :lua require("harpoon.mark").add_file()<CR>
 nnoremap <leader>e :lua require("harpoon.ui").toggle_quick_menu()<CR>
@@ -628,8 +500,6 @@ nnoremap <leader>4 :lua require("harpoon.ui").nav_file(4)<CR>
 
 " UNDOTREE
 let g:undotree_SetFocusWhenToggle = 1
-
-" Toggle undotree
 nnoremap <leader>u :UndotreeToggle<CR>
 
 
@@ -662,7 +532,7 @@ require("CopilotChat").setup {
     width = 0.3, -- fractional width of parent, or absolute width in columns when > 1
     height = 0.5, -- fractional height of parent, or absolute height in rows when > 1
     -- Options below only apply to floating windows
-    relative = 'editor', -- 'editor', 'win', 'cursor', 'mouse'
+    relative = 'win', -- 'editor', 'win', 'cursor', 'mouse'
     border = 'single', -- 'none', single', 'double', 'rounded', 'solid', 'shadow'
     row = nil, -- row position of the window, default is centered
     col = nil, -- column position of the window, default is centered
@@ -700,6 +570,21 @@ require("CopilotChat").setup {
 EOF
 
 
+" OBSIDIAN NVIM
+autocmd BufRead,BufNewFile ~/Desktop/sftw/obsidian/*/*.md setlocal conceallevel=2
+nnoremap <leader>op :lua require("obsidianPreview").preview_link()<CR>
+
+lua << EOF
+require("obsidian").setup({
+  workspaces = {
+    {
+      name = "gaitanos_mind",
+      path = "~/Desktop/sftw/obsidian/gaitanos_mind",
+    },
+  }
+})
+EOF
+
 
 " CONFORM
 lua << EOF
@@ -729,6 +614,8 @@ EOF
 
 
 " ZEN MODE
+nnoremap <leader>z :lua require("zen-mode").toggle()<CR>
+
 lua << EOF
 require("zen-mode").setup({
   window = {
@@ -753,11 +640,10 @@ require("zen-mode").setup({
 })
 EOF
 
-nnoremap <leader>z :lua require("zen-mode").toggle()<CR>
-
-
 
 " TWILIGHT
+nnoremap <leader>t :lua require("twilight").toggle()<CR>
+
 lua << EOF
 require("twilight").setup({
   dimming = {
@@ -775,9 +661,6 @@ require("twilight").setup({
   exclude = {},
 })
 EOF
-
-nnoremap <leader>t :lua require("twilight").toggle()<CR>
-
 
 
 " TODO COMMENTS
