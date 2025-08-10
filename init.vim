@@ -4,6 +4,7 @@ let mapleader = "\<Space>"
 " Line Numbers set number
 set number
 set relativenumber
+set cursorline
 
 " Display, indentation and Wrapping
 set autoindent
@@ -11,7 +12,8 @@ set smarttab
 set cindent
 set textwidth=80
 set cmdheight=2
-set nowrap
+set wrap
+set linebreak
 set termguicolors
 set scrolloff=8
 set colorcolumn=80
@@ -46,8 +48,8 @@ autocmd FileType html,css,javascript,typescript,typescriptreact,javascriptreact 
 
 "SYSTEM REMAPS
 " Exit mode with 'j+k'
-inoremap jk <ESC>       " Works in insert mode"
-vnoremap jk <ESC>       " Works in Visual Mode
+inoremap jk <ESC>l       " Works in insert mode"
+vnoremap jk <ESC>l       " Works in Visual Mode
 tnoremap jk <C-\><C-n>  " Works in Terminal Mode 
 
 " Use Ctrl + Tab / Ctrl + Shift + Tab to switch tabs
@@ -120,88 +122,54 @@ nnoremap <leader>s :%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left>
 call plug#begin('~/.local/share/nvim/site/plugged')
 
 Plug 'nvim-tree/nvim-tree.lua'        " File tree
-
 Plug 'nvim-tree/nvim-web-devicons'    " Icons
-
 Plug 'airblade/vim-gitgutter'         " Displays git diff markers in the gutter
-
 Plug 'preservim/nerdcommenter'        " Enables quick commenting in code
-
 Plug 'christoomey/vim-tmux-navigator' " Navigation between Vim and Tmux splits 
-
-Plug 'nvim-lua/plenary.nvim'          " Lua utility library ( Required by many modern Neovim plugins )
-
+Plug 'nvim-lua/plenary.nvim'          " Lua utility library
+Plug 'nvim-lua/popup.nvim'            " Popup API for Neovim
 Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' } " Fuzzy File Finder
-
 Plug 'vim-airline/vim-airline'        " Status bar customization
-
 Plug 'vim-airline/vim-airline-themes' " Vim Airline themes
-
 Plug 'dense-analysis/ale'             " Linting Engine
-
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'} " Syntax Highlighting
-
 Plug 'folke/tokyonight.nvim'          " Tokyonight colorscheme
-
 Plug 'tpope/vim-fugitive'             " Git Wrapper Plugin
-
 Plug 'neovim/nvim-lspconfig'          " Core LSP support
-
 Plug 'mason-org/mason.nvim'           " Easy LSP installation
-
 Plug 'mason-org/mason-lspconfig.nvim' " Bridge between Mason and lspconfig
-
 Plug 'hrsh7th/nvim-cmp'               " Core autocompletion engine
-
 Plug 'hrsh7th/cmp-nvim-lsp'           " Integrates nvim-cmp with Neovim's built-in LSP
-
 Plug 'hrsh7th/cmp-buffer'             " Buffer completion
-
 Plug 'hrsh7th/cmp-path'               " Path completion
-
 Plug 'saadparwaiz1/cmp_luasnip'       " Snippet completion
-
 Plug 'L3MON4D3/LuaSnip'               " Snippet engine
-
 Plug 'glepnir/lspsaga.nvim'           " UI Enhancements for LSP
-
 Plug 'lewis6991/hover.nvim'           " Add hover properties
-
 Plug 'lukas-reineke/indent-blankline.nvim' " Indentation Guidelines
-
 Plug 'NvChad/nvim-colorizer.lua'      " Highlight colors
-
 Plug 'roobert/tailwindcss-colorizer-cmp.nvim' " Show TailwindCSS colors in preview
-
 Plug 'rafamadriz/friendly-snippets'   " Django Snippets
-
 Plug 'tweekmonster/django-plus.vim'   " Django Template Syntax Highlighting
-
 Plug 'ThePrimeagen/harpoon'           " Harpoon File Navigator
-
 Plug 'mbbill/undotree'                " Undo Tree
-
 Plug 'ThePrimeagen/vim-be-good'       " Vim Practice Game
-
 Plug 'github/copilot.vim'	      " AI Copilot
-
 Plug 'CopilotC-Nvim/CopilotChat.nvim' " Copilot Chat integration
-
 Plug 'MeanderingProgrammer/render-markdown.nvim' " Render markdown syntax
-
 Plug 'code-biscuits/nvim-biscuits'    " Show code context in the gutter
-
 Plug 'epwalsh/obsidian.nvim'          " Obsidian integration for Neovim
-
 Plug 'stevearc/conform.nvim'	      " Code formatting plugin
-
 Plug 'folke/zen-mode.nvim'	      " Zen mode
-
 Plug 'folke/twilight.nvim'	      " Dim inactive portions of the code
-
 Plug 'folke/todo-comments.nvim'	      " Highlight TODO comments
-
-Plug 'jbyuki/venn.nvim'		      " Draw ASCII diagrams
+Plug 'jiangmiao/auto-pairs'	      " Auto close pairs like brackets, quotes, etc.
+Plug 'mracos/mermaid.vim'		" Render mermaid syntax in neovim
+Plug '3rd/image.nvim', { 'do': 'make' }   " render images in terminal buffers
+Plug '3rd/diagram.nvim'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug '0x100101/lab.nvim', { 'do': 'cd js && npm ci' }
 
 call plug#end()
 
@@ -366,11 +334,9 @@ colorscheme tokyonight
 " MASON
 lua << EOF
 require("mason").setup()
-EOF
 
 
-" MASON-LSP
-lua << EOF
+-- MASON-LSP
 require("mason-lspconfig").setup {
     ensure_installed = { "pyright", "ts_ls", "html", "cssls", "lua_ls", "vimls" },
     automatic_installation = false,
@@ -383,16 +349,8 @@ for _, server in ipairs(servers) do
   require("lspconfig")[server].setup {
         handlers = {
             ["textDocument/publishDiagnostics"] = function() end,
-            ["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-                border = "rounded",
-                max_width = 80,
-                max_height = 20
-            })
+            ["textDocument/hover"] = function() end,
         },
-        on_attach = function(client, bufnr)
-            vim.keymap.set('n', 'K', require("hover").hover, { desc = "hover.nvim" })
-            vim.keymap.set('n', 'gK', require("hover").hover_select, { desc = "hover.nvim (select)" })
-        end
     }
 end
 
@@ -417,10 +375,15 @@ cmp.setup({
     mapping = {
         ["<C-Space>"] = cmp.mapping.complete(),
         ["<CR>"] = cmp.mapping.confirm({ select = true }),
+	['<Tab>'] = cmp.mapping.select_next_item(),
+    	['<S-Tab>'] = cmp.mapping.select_prev_item(),
+    	['<Esc>'] = cmp.mapping.close(),
     },
     sources = {
         { name = "nvim_lsp" },
         { name = "luasnip" },
+	{ name = "path" },
+        { name = "buffer" },
     },
     snippet = {
         expand = function(args)
@@ -431,13 +394,43 @@ cmp.setup({
 EOF
 
 "autocmd CursorHold * lua vim.lsp.buf.hover()
-"set updatetime=5000  " Reduce delay for hover popup (default is 4000ms)
-nnoremap K :lua vim.lsp.buf.hover()<CR>
+"set updatetime=5000  " Reduce delay for hover popup
 
 
 " LSPSAGA
 lua << EOF
 require("lspsaga").setup({})
+EOF
+
+
+" HOVER NVIM
+lua << EOF
+require("hover").setup {
+            init = function()
+                -- Require providers
+                require("hover.providers.lsp")
+                -- require('hover.providers.gh')
+                -- require('hover.providers.gh_user')
+                -- require('hover.providers.jira')
+                -- require('hover.providers.dap')
+                -- require('hover.providers.fold_preview')
+                -- require('hover.providers.diagnostic')
+                -- require('hover.providers.man')
+                require('hover.providers.dictionary')
+                -- require('hover.providers.highlight')
+            end,
+            preview_opts = {
+                border = 'rounded'
+            },
+            -- Whether the contents of a currently open hover window should be moved
+            -- to a :h preview-window when pressing the hover keymap.
+            preview_window = false,
+            title = true,
+            mouse_providers = {
+                'LSP'
+            },
+            mouse_delay = 000
+}
 EOF
 
 
@@ -465,21 +458,6 @@ EOF
 " TAILWINDCSS-COLORIZER-CMP
 lua <<EOF
 require'tailwindcss-colorizer-cmp'.setup()
-EOF
-
-
-" Enable Tab to navigate completion
-lua << EOF
-local cmp = require'cmp'
-cmp.setup({
-  mapping = {
-    ['<Tab>'] = cmp.mapping.select_next_item(),
-    ['<S-Tab>'] = cmp.mapping.select_prev_item(),
-    ['<CR>'] = cmp.mapping.confirm({ select = true }),
-    ['<C-Space>'] = cmp.mapping.complete(),
-    ['<Esc>'] = cmp.mapping.close(),
-  },
-})
 EOF
 
 
@@ -515,8 +493,8 @@ autocmd BufReadPost *.md :RenderMarkdown
 lua <<EOF
 require("nvim-biscuits").setup({
   default_config = {
-    max_length = 40,
-    min_distance = 10,
+    max_length = 50,
+    min_distance = 5,
     prefix_string = " ⤷ ",
   },
   cursor_line_only = true,
@@ -628,7 +606,7 @@ require("zen-mode").setup({
       showcmd = false, -- disables the command in the last line of the screen
       laststatus = 0, -- turn off the statusline in zen mode
     },
-    twilight = { enabled = true },
+    twilight = { enabled = false },
     gitsigns = { enabled = false },
     tmux = { enabled = false },
     todo = { enabled = false },
