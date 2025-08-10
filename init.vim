@@ -52,6 +52,10 @@ inoremap jk <ESC>l       " Works in insert mode"
 vnoremap jk <ESC>l       " Works in Visual Mode
 tnoremap jk <C-\><C-n>  " Works in Terminal Mode 
 
+nnoremap K :lua require("hover").hover()<CR>
+nnoremap gK :lua require("hover").hover_select()<CR>
+nnoremap <leader>d :lua require("hover.providers.dictionary").hover()<CR>
+
 " Use Ctrl + Tab / Ctrl + Shift + Tab to switch tabs
 nnoremap <C-t>   :tabnext<CR>
 nnoremap <C-A-t> :tabprevious<CR>
